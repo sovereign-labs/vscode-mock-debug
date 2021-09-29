@@ -9,7 +9,7 @@ import { WorkspaceFolder, DebugConfiguration, ProviderResult, CancellationToken 
 import { MockDebugSession } from './mockDebug';
 import { FileAccessor } from './mockRuntime';
 
-export function activateMockDebug(context: vscode.ExtensionContext, factory?: vscode.DebugAdapterDescriptorFactory) {
+export function activateMockDebug(context: vscode.ExtensionContext) {
 
 	context.subscriptions.push(
 		vscode.commands.registerCommand('extension.mock-debug.runEditorContents', (resource: vscode.Uri) => {
@@ -88,13 +88,8 @@ export function activateMockDebug(context: vscode.ExtensionContext, factory?: vs
 		}
 	}, vscode.DebugConfigurationProviderTriggerKind.Dynamic));
 
-	if (!factory) {
-		factory = new InlineDebugAdapterFactory();
-	}
+    let factory: vscode.DebugAdapterDescriptorFactory | undefined = new InlineDebugAdapterFactory();
 	context.subscriptions.push(vscode.debug.registerDebugAdapterDescriptorFactory('mock', factory));
-	if ('dispose' in factory) {
-		context.subscriptions.push(factory);
-	}
 
 	// override VS Code's default implementation of the debug hover
 	// here we match only Mock "variables", that are words starting with an '$' 
